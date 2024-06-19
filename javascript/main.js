@@ -1,54 +1,140 @@
-const Gameboard = (function () {
-  const sayName = function (name) {
-    console.log(`My name is ${name}`);
-  };
-
-  let rows = 3;
-  let columns = 3;
-  let board = [];
-
-  const getBoard = () => {
-    board;
-  };
+const Gameboard = function () {
+  const rows = 3;
+  const columns = 3;
+  const board = [];
 
   for (let i = 0; i < rows; i++) {
     board[i] = [];
     for (let j = 0; j < columns; j++) {
-      board[i].push(Cell());
+      board[i].push(null);
     }
   }
 
+  const getBoard = () => board;
+
+  function chkLine(a, b, c) {
+    // Check first cell non-zero and all cells match
+    return a != 0 && b === a && c === a;
+  }
+  // const dropToken = (column, player) => {
+  //   const availableCells = board.filter((row) => row[column].getValue() === 0).map(row => row[column]);
+
+  //   if (!availableCells.length) return;
+
+  //   const lowestRow = availableCells.length - 1;
+  //   board[lowestRow][column].addToken(player);
+  // };
+
+  function chkLine(a, b, c) {
+    // Check first cell non-zero and all cells match
+    return a != 0 && b === a && c === a;
+  }
+
+  function chkWinner(bd) {
+    let result;
+    for (let r = 0; r < 1; r++) {
+      // const element = array[r];
+      for (let c = 0; c < 3; c++) {
+        // co element = array[c];
+        if (
+          chkLine(bd[r][c], bd[r + 1][c], bd[r + 2][c]) &&
+          bd[r][c] !== null
+        ) {
+          result = `found three in down`;
+        }
+      }
+    }
+
+    for (let r = 0; r < 3; r++) {
+      // const element = array[r];
+      for (let c = 0; c < 1; c++) {
+        // co element = array[c];
+        if (
+          chkLine(bd[r][c], bd[r][c + 1], bd[r][c + 2]) &&
+          bd[r][c] !== null
+        ) {
+          result = `found three in right`;
+        }
+      }
+    }
+
+    for (let r = 0; r < 1; r++) {
+      // const element = array[r];
+      for (let c = 0; c < 3; c++) {
+        // co element = array[c];
+        if (
+          chkLine(bd[r][c], bd[r + 1][c + 1], bd[r + 2][c + 2]) &&
+          bd[r][c] !== null
+        ) {
+          result = `found three in right-down`;
+        }
+      }
+    }
+
+    for (let r = 0; r < 1; r++) {
+      // const element = array[r];
+      for (let c = 0; c < 3; c++) {
+        // co element = array[c];
+        if (
+          chkLine(bd[r][c], bd[r + 1][c - 1], bd[r + 2][c - 2]) &&
+          bd[r][c] !== null
+        ) {
+          result = `${bd[r]} found three in left-down`;
+        }
+      }
+    }
+    return result;
+  }
+
+  const dropToken = (row, col, val) => {
+    if (board[row][col] !== null) {
+      return console.log("already have value");
+    } else {
+      board[row][col] = val;
+      }
+    return chkWinner(board);
+  };
+
   const printBoard = () => {
     const boardWithCellValues = board.map((row) =>
-      row.map((cell) => cell.getValue())
-    );
+      row.map((cell) => cell));
     console.log(boardWithCellValues);
   };
 
-  return { getBoard, printBoard };
-})();
+  // const playRound = (row, col, val) => {
+  //   dropToken(row, col, val);
 
-function Cell() {
-  let value = 1;
+  //   console.log("check");
+  //   chkWinner(board);
+  //   console.log("check complete");
+  // };
 
-  // Accept a player's token to change the value of the cell
-  const addToken = (player) => {
-    value = player;
-  };
+  return {getBoard, dropToken, printBoard, chkWinner };
+};
 
-  // How we will retrieve the current value of this cell through closure
-  const getValue = () => value;
+// function Cell() {
+//           2  let value = null;
 
-  return {
-    addToken,
-    getValue,
-  };
-}
+//   // Accept a player's token to change the value of the cell
+//   const addToken = (player) => {
+//     value = player;
+//   };
+
+//   // How we will retrieve the current value of this cell through closure
+//   const getValue = () => value;
+
+//   return {
+//     addToken,
+//     getValue,
+//   };
+// }
 
 function chkLine(a, b, c) {
   // Check first cell non-zero and all cells match
   return a != 0 && b === a && c === a;
 }
+
+// chkWinner(x)
 
 let result;
 function chkWinner(bd) {
@@ -76,8 +162,7 @@ function chkWinner(bd) {
     // const element = array[r];
     for (let c = 0; c < 3; c++) {
       // co element = array[c];
-      if (
-        chkLine(bd[r][c], bd[r + 1][c + 1], bd[r + 2][c + 2])) {
+      if (chkLine(bd[r][c], bd[r + 1][c + 1], bd[r + 2][c + 2])) {
         result = `${bd[r]} found three in right-down`;
         // return bd.indexOf(r);
       }
@@ -88,26 +173,24 @@ function chkWinner(bd) {
     // const element = array[r];
     for (let c = 0; c < 3; c++) {
       // co element = array[c];
-      if (
-        chkLine(bd[r][c], bd[r + 1][c - 1], bd[r + 2][c - 2])
-      ) {
+      if (chkLine(bd[r][c], bd[r + 1][c - 1], bd[r + 2][c - 2])) {
         result = `${bd[r]} found three in left-down`;
-
       }
     }
   }
   return result;
 }
 
-x = [
-  [2, 2, 2],
-  [1, 1, 1],
-  [3, 3, 3],
-];
 
-y =[[0, 0, 0, 0, 0, 0, 1],
-   [0, 0, 0, 0, 0, 0, 1],
-   [0, 0, 0, 0, 0, 0, 1],
-   [0, 0, 0, 0, 0, 0, 1],
-   [0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0]];
+
+const dropToken = (arr, row, col, value) => {
+  if (arr[row][col] !== null) {
+    return console.log("already have value");
+  } else {
+    arr[row][col] = value;
+  }
+  return arr;
+};
+console.log(Gameboard());
+// const getValue(arr, col)
+const game = Gameboard();
