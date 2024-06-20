@@ -106,12 +106,12 @@ function GameController(
 
   // return { chkWinner };
   // }
-  const checkTie = () =>{
-    if(movesCounter===9){
-      gameBoard.resetBoard();
-      return "it's a tie"
-    }
-  }
+  // const checkTie = () =>{
+  //   if(movesCounter===9){
+  //     gameBoard.resetBoard();
+  //     return "it's a tie"
+  //   }
+  // }
 
   const printNewRound = () => {
     gameBoard.printBoard();
@@ -123,11 +123,11 @@ function GameController(
     let board = gameBoard.addToken(row, col, getActivePlayer().token);
 
     let result = chkWinner(board);
-    if(checkTie){
-      result = checkTie();
-    }
+    // if(checkTie){
+    //   result = checkTie();
+    // }
 
-    
+
     if(board !== "invalid") {
       switchPlayerTurn();
       movesCounter++;
