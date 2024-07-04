@@ -5,11 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 
+<style>
+    body, button{
+        font-family: "Press Start 2P", cursive;
+    }
+</style>
+
 <body>
+    <div id="wrapper">
+        <!-- The name with the name -->
+        <header>
+            <h1>TIC - TAC - TOE</h1>
+        </header>
+        <!-- name ends here  -->
 
+        <!-- Main menu starts here  -->
+        <main id="button-section">
+            <button id="start-btn" type="button" class="button">PLAY </button>
+
+            <button type="button" id="quit-btn" class="button">QUIT </button>
+        </main>
+        <!-- Main menu ends here  -->
+    </div>
 </body>
-<script src="./javascript/main.js"></script>
+<script>
+    const startBtn =  document.getElementById("start-btn").addEventListener("click", ()=>{
+        window.location.href = "./pages/gamePage.html"
+    });
 
+    const quitBtn =  document.getElementById("quit-btn").addEventListener("click", ()=>{
+        window.close();
+    })
+</script>
 </html>
