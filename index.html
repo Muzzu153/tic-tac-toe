@@ -9,14 +9,15 @@
 </head>
 
 <style>
-    body, button{
+    body,
+    button {
         font-family: "Press Start 2P", cursive;
     }
 </style>
 
 <body>
     <div id="wrapper">
-        <!-- The name with the name -->
+        <!-- header with the name -->
         <header>
             <h1>TIC - TAC - TOE</h1>
         </header>
@@ -32,12 +33,15 @@
     </div>
 </body>
 <script>
-    const startBtn =  document.getElementById("start-btn").addEventListener("click", ()=>{
+    // open gameplay page
+    const startBtn = document.getElementById("start-btn").addEventListener("click", () => {
         window.location.href = "./pages/gamePage.html"
     });
 
-    const quitBtn =  document.getElementById("quit-btn").addEventListener("click", ()=>{
+    // close main menu window 
+    const quitBtn = document.getElementById("quit-btn").addEventListener("click", () => {
         window.close();
     })
 </script>
+
 </html>
