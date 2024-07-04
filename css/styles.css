@@ -1,0 +1,89 @@
+@font-face {
+  font-family: "Press Start 2P";
+  src: url("../fonts/PressStart2P/PressStart2P-Regular.woff"),
+    url("../fonts/PressStart2P/PressStart2P-Regular.woff2");
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  background: #bfa082;
+}
+
+#wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  header {
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  #button-section {
+    margin-top: 10rem;
+    display: flex;
+    flex-direction: column;
+
+    button {
+      margin: 1.2rem;
+      appearance: none;
+      border: none;
+      padding: 2rem 7rem;
+      font-size: 2rem;
+    }
+
+    .button {
+      background: #e39828;
+      display: inline-block;
+      position: relative;
+      text-align: center;
+      color: white;
+      box-shadow: inset -4.5px -4.5px 0px 0px #b17925;
+    }
+
+    .button:hover,
+    .button:focus {
+      background: #d38f28;
+      box-shadow: inset -6.5px -6.5px 0px 0px #b17925;
+    }
+
+    .button:active {
+      box-shadow: inset 4px 4px 0px 0px #b17925;
+    }
+
+    .button::before,
+    .button::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      box-sizing: content-box;
+    }
+
+    .button::before {
+      top: -6px;
+      left: 0;
+      border-top: 6px black solid;
+      border-bottom: 6px black solid;
+    }
+
+    .button::after {
+      left: -6px;
+      top: 0;
+      border-left: 6px black solid;
+      border-right: 6px black solid;
+    }
+  }
+}
