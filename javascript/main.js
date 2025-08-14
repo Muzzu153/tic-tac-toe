@@ -1,58 +1,50 @@
+// Gameboard Module
 const Gameboard = function () {
   const rows = 3;
   const columns = 3;
   let board = [];
 
-  const makeBoard = ()=>{
+  const makeBoard = () => {
+    const newBoard = [];
     for (let i = 0; i < rows; i++) {
-      board[i] = [];
+      newBoard[i] = [];
       for (let j = 0; j < columns; j++) {
-        board[i].push(null);
+        newBoard[i][j] = null;
       }
     }
-    return board
-  }
-  board = makeBoard();
-
-  const getBoard = () => {
-    return board;
+    return newBoard;
   };
+
+  const resetBoard = () => {
+    board = makeBoard();
+  };
+
+  const getBoard = () => board;
 
   const addToken = (row, col, val) => {
     if (board[row][col] === null) {
       board[row][col] = val;
-    } else {
-      return "invalid";
+      return board;
     }
-    return board;
+    return "invalid";
   };
 
-  const printBoard = () => {
-    const boardWithCellValues = board.map((row) => row.map((cell) => cell));
-    console.log(boardWithCellValues);
-  };
+  resetBoard(); // initialize board
 
-  const resetBoard = makeBoard;
-
-  return { getBoard, addToken, printBoard, resetBoard };
+  return { getBoard, addToken, resetBoard };
 };
 
+// Game Controller Module
 function GameController(
-  playerOneName = "player One",
-  playerTwoName = "player two"
+  playerOneName = "Player One",
+  playerTwoName = "Player Two"
 ) {
   let movesCounter = 0;
   const gameBoard = Gameboard();
 
   const players = [
-    {
-      name: playerOneName,
-      token: "X",
-    },
-    {
-      name: playerTwoName,
-      token: "O",
-    },
+    { name: playerOneName, token: "X" },
+    { name: playerTwoName, token: "O" },
   ];
 
   let activePlayer = players[0];
@@ -63,92 +55,98 @@ function GameController(
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
   };
 
-  // function getWinner() {
   function chkLine(a, b, c) {
-    return a != null && b === a && c === a;
+    return a != null && a === b && a === c;
   }
 
-  function chkWinner(bd) {
-    let result;
-    for (let r = 0; r < 1; r++) {
-      for (let c = 0; c < 3; c++) {
-        if (chkLine(bd[r][c], bd[r + 1][c], bd[r + 2][c])) {
-          result = `${getActivePlayer().name} won`;
-        }
-      }
-    }
+  function chkWinner(bd, player) {
+    let winPatterns = [
+      // rows
+      [bd[0][0], bd[0][1], bd[0][2]],
+      [bd[1][0], bd[1][1], bd[1][2]],
+      [bd[2][0], bd[2][1], bd[2][2]],
+      // columns
+      [bd[0][0], bd[1][0], bd[2][0]],
+      [bd[0][1], bd[1][1], bd[2][1]],
+      [bd[0][2], bd[1][2], bd[2][2]],
+      // diagonals
+      [bd[0][0], bd[1][1], bd[2][2]],
+      [bd[0][2], bd[1][1], bd[2][0]],
+    ];
 
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 1; c++) {
-        if (chkLine(bd[r][c], bd[r][c + 1], bd[r][c + 2])) {
-          result = `${getActivePlayer().name} won`;
-        }
+    for (let line of winPatterns) {
+      if (chkLine(...line)) {
+        return `${player.name} won!`;
       }
     }
-
-    for (let r = 0; r < 1; r++) {
-      for (let c = 0; c < 3; c++) {
-        if (chkLine(bd[r][c], bd[r + 1][c + 1], bd[r + 2][c + 2])) {
-          result = `${getActivePlayer().name} won`;
-        }
-      }
-    }
-
-    for (let r = 0; r < 1; r++) {
-      for (let c = 0; c < 3; c++) {
-        if (chkLine(bd[r][c], bd[r + 1][c - 1], bd[r + 2][c - 2])) {
-          result = `${getActivePlayer().name} won`;
-        }
-      }
-    }
-    return result;
+    return null;
   }
-
-  // return { chkWinner };
-  // }
-  // const checkTie = () =>{
-  //   if(movesCounter===9){
-  //     gameBoard.resetBoard();
-  //     return "it's a tie"
-  //   }
-  // }
-
-  const printNewRound = () => {
-    gameBoard.printBoard();
-    console.log(`${getActivePlayer().name}'s turn.`);
-  };
-
 
   const playRound = (row, col) => {
-    let board = gameBoard.addToken(row, col, getActivePlayer().token);
+    const currentPlayer = getActivePlayer();
+    let board = gameBoard.addToken(row, col, currentPlayer.token);
 
-    let result = chkWinner(board);
-    // if(checkTie){
-    //   result = checkTie();
-    // }
+    if (board === "invalid") return "Invalid move";
 
+    movesCounter++;
 
-    if(board !== "invalid") {
-      switchPlayerTurn();
-      movesCounter++;
-    }
+    let winner = chkWinner(board, currentPlayer);
+    if (winner) return winner;
 
+    if (movesCounter === 9) return "It's a tie!";
 
-    console.log(movesCounter)
-    if(movesCounter===9){
-      gameBoard.resetBoard();
-      printNewRound();
-      return "it's a tie"
-    }
-
-
-    printNewRound();
-
-    return result;
+    switchPlayerTurn();
+    return `${getActivePlayer().name}'s turn`;
   };
 
-  printNewRound();
-  return { printNewRound, playRound };
+  const resetGame = () => {
+    gameBoard.resetBoard();
+    movesCounter = 0;
+    activePlayer = players[0];
+  };
+
+  return {
+    playRound,
+    getBoard: gameBoard.getBoard,
+    resetGame,
+    getActivePlayer,
+  };
 }
 
-const game = GameController();
+// DOM Logic
+document.addEventListener("DOMContentLoaded", () => {
+  const game = GameController();
+  const boardEl = document.querySelector(".board");
+  const statusEl = document.querySelector(".status");
+  const resetBtn = document.querySelector("#reset-btn");
+
+  const renderBoard = () => {
+    boardEl.innerHTML = "";
+    const board = game.getBoard();
+    board.forEach((row, r) => {
+      row.forEach((cell, c) => {
+        const cellEl = document.createElement("div");
+        cellEl.classList.add("cell");
+        cellEl.textContent = cell ? cell : "";
+        cellEl.addEventListener("click", () => handleMove(r, c));
+        boardEl.appendChild(cellEl);
+      });
+    });
+  };
+
+  const handleMove = (r, c) => {
+    const result = game.playRound(r, c);
+    statusEl.textContent = result;
+    renderBoard();
+  };
+
+  resetBtn.addEventListener("click", () => {
+    game.resetGame();
+    statusEl.textContent = `${game.getActivePlayer().name}'s turn`;
+    renderBoard();
+  });
+
+  // Initial render
+  statusEl.textContent = `${game.getActivePlayer().name}'s turn`;
+  renderBoard();
+});
