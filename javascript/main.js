@@ -1,4 +1,3 @@
-// Gameboard Module
 const Gameboard = function () {
   const rows = 3;
   const columns = 3;
@@ -22,7 +21,7 @@ const Gameboard = function () {
   const getBoard = () => board;
 
   const addToken = (row, col, val) => {
-    if (board[row][col] === null) {
+    if (board[row] && board[row][col] === null) {
       board[row][col] = val;
       return board;
     }
@@ -40,6 +39,8 @@ function GameController(
   playerTwoName = "Player Two"
 ) {
   let movesCounter = 0;
+  let gameEnded = false;
+  let winningCells = [];
   const gameBoard = Gameboard();
 
   const players = [
@@ -50,6 +51,8 @@ function GameController(
   let activePlayer = players[0];
 
   const getActivePlayer = () => activePlayer;
+  const isGameEnded = () => gameEnded;
+  const getWinningCells = () => winningCells;
 
   const switchPlayerTurn = () => {
     activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -62,20 +65,54 @@ function GameController(
   function chkWinner(bd, player) {
     let winPatterns = [
       // rows
-      [bd[0][0], bd[0][1], bd[0][2]],
-      [bd[1][0], bd[1][1], bd[1][2]],
-      [bd[2][0], bd[2][1], bd[2][2]],
+      [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+      ],
+      [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
       // columns
-      [bd[0][0], bd[1][0], bd[2][0]],
-      [bd[0][1], bd[1][1], bd[2][1]],
-      [bd[0][2], bd[1][2], bd[2][2]],
+      [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+      ],
+      [
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ],
+      [
+        [0, 2],
+        [1, 2],
+        [2, 2],
+      ],
       // diagonals
-      [bd[0][0], bd[1][1], bd[2][2]],
-      [bd[0][2], bd[1][1], bd[2][0]],
+      [
+        [0, 0],
+        [1, 1],
+        [2, 2],
+      ],
+      [
+        [0, 2],
+        [1, 1],
+        [2, 0],
+      ],
     ];
 
-    for (let line of winPatterns) {
-      if (chkLine(...line)) {
+    for (let pattern of winPatterns) {
+      const [a, b, c] = pattern;
+      if (chkLine(bd[a[0]][a[1]], bd[b[0]][b[1]], bd[c[0]][c[1]])) {
+        winningCells = pattern;
         return `${player.name} won!`;
       }
     }
@@ -83,6 +120,8 @@ function GameController(
   }
 
   const playRound = (row, col) => {
+    if (gameEnded) return "Game over! Reset to play again.";
+
     const currentPlayer = getActivePlayer();
     let board = gameBoard.addToken(row, col, currentPlayer.token);
 
@@ -91,9 +130,15 @@ function GameController(
     movesCounter++;
 
     let winner = chkWinner(board, currentPlayer);
-    if (winner) return winner;
+    if (winner) {
+      gameEnded = true;
+      return winner;
+    }
 
-    if (movesCounter === 9) return "It's a tie!";
+    if (movesCounter === 9) {
+      gameEnded = true;
+      return "It's a tie!";
+    }
 
     switchPlayerTurn();
     return `${getActivePlayer().name}'s turn`;
@@ -102,6 +147,8 @@ function GameController(
   const resetGame = () => {
     gameBoard.resetBoard();
     movesCounter = 0;
+    gameEnded = false;
+    winningCells = [];
     activePlayer = players[0];
   };
 
@@ -110,6 +157,8 @@ function GameController(
     getBoard: gameBoard.getBoard,
     resetGame,
     getActivePlayer,
+    isGameEnded,
+    getWinningCells,
   };
 }
 
@@ -119,15 +168,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const boardEl = document.querySelector(".board");
   const statusEl = document.querySelector(".status");
   const resetBtn = document.querySelector("#reset-btn");
+  const backBtn = document.querySelector("#back-btn");
+  const gameContainer = document.querySelector(".game-container");
 
   const renderBoard = () => {
     boardEl.innerHTML = "";
     const board = game.getBoard();
+    const winningCells = game.getWinningCells();
+
     board.forEach((row, r) => {
       row.forEach((cell, c) => {
         const cellEl = document.createElement("div");
         cellEl.classList.add("cell");
         cellEl.textContent = cell ? cell : "";
+
+        // Highlight winning cells
+        const isWinningCell = winningCells.some(
+          ([wr, wc]) => wr === r && wc === c
+        );
+        if (isWinningCell) {
+          cellEl.classList.add("winning");
+        }
+
         cellEl.addEventListener("click", () => handleMove(r, c));
         boardEl.appendChild(cellEl);
       });
@@ -137,13 +199,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleMove = (r, c) => {
     const result = game.playRound(r, c);
     statusEl.textContent = result;
+
+    // Add status styling based on game state
+    statusEl.className = "status";
+    if (result.includes("won")) {
+      statusEl.classList.add("winner");
+    } else if (result.includes("tie")) {
+      statusEl.classList.add("tie");
+    }
+
+    // Add game over animation
+    if (game.isGameEnded() && !gameContainer.classList.contains("game-over")) {
+      gameContainer.classList.add("game-over");
+      setTimeout(() => {
+        gameContainer.classList.remove("game-over");
+      }, 500);
+    }
+
     renderBoard();
   };
 
   resetBtn.addEventListener("click", () => {
     game.resetGame();
     statusEl.textContent = `${game.getActivePlayer().name}'s turn`;
+    statusEl.className = "status"; // Reset status styling
+    gameContainer.classList.remove("game-over");
     renderBoard();
+  });
+
+  // Back button functionality
+  backBtn.addEventListener("click", () => {
+    // Go back to main menu (adjust path as needed)
+    window.location.href = "../index.html";
   });
 
   // Initial render
